@@ -1,8 +1,13 @@
 import discord
 from discord.ext import commands
+from dotenv import load_dotenv
 import json
 import os
 from datetime import datetime
+
+# load token from .env file
+load_dotenv()
+TOKEN = os.getenv("TOKEN")
 
 # basic bot setup
 intents = discord.Intents.default()
@@ -39,6 +44,9 @@ async def on_message_delete(message):
     if message.author.bot:
         return
 
+    if message.guild is None:
+        return
+
     # ignore if no mentions
     if not message.mentions:
         return
@@ -70,14 +78,14 @@ async def on_message_delete(message):
 
     save_data(data)
 
-    # message to show who 
+    # message to show who
     embed = discord.Embed(
-        title="ghost pinger ",
-        description=f"{message.author.mention} tried to ghost ping",
+        title="Ghost Pinger",
+        description=f"{message.author.mention} tried to ghost ping"
     )
-    embed.add_field(name="who got pinged", value=", ".join(mentioned_users), inline=False)
-    embed.add_field(name="deleted message", value=message.content if message.content else "[no text]", inline=False)
-    embed.add_field(name="channel", value=message.channel.mention, inline=False)
+    embed.add_field(name="Who got pinged", value=", ".join(mentioned_users), inline=False)
+    embed.add_field(name="Deleted message", value=message.content if message.content else "[no text]", inline=False)
+    embed.add_field(name="Channel", value=message.channel.mention, inline=False)
 
     await message.channel.send(embed=embed)
 
@@ -113,8 +121,8 @@ async def ghostlb(ctx):
     )[:10]
 
     embed = discord.Embed(
-        title="ghost ping leaderboard",
-        description="top offenders lmao"
+        title="Ghost Ping Leaderboard",
+        description="Top offenders"
     )
 
     for index, (user_id, info) in enumerate(leaderboard, start=1):
@@ -143,12 +151,12 @@ async def ghostlog(ctx, member: discord.Member = None):
     logs = data[guild_id][str(member.id)]["logs"][-5:]
 
     embed = discord.Embed(
-        title=f"recent ghost pings for {member}",
+        title=f"Recent ghost pings for {member}"
     )
 
     for i, log in enumerate(logs, start=1):
         embed.add_field(
-            name=f"log {i}",
+            name=f"Log {i}",
             value=(
                 f"time: {log['time']}\n"
                 f"channel: {log['channel']}\n"
@@ -161,4 +169,4 @@ async def ghostlog(ctx, member: discord.Member = None):
     await ctx.send(embed=embed)
 
 
-bot.run("YOUR_BOT_TOKEN")
+bot.run(TOKEN)
